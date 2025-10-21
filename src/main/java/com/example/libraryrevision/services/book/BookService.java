@@ -93,7 +93,7 @@ public class BookService {
 
         Comparator<Book> cmp = switch (criteriaChar) {
             case 't' -> Comparator.comparing(Book::getTitle,
-                    Comparator.nullsLast(String::compareTo));
+                    Comparator.nullsLast(String::compareToIgnoreCase));
             case 'a' -> Comparator.comparing(Book::getAuthor,
                     Comparator.nullsLast(String::compareTo));
             case 'i' -> Comparator.comparing(Book::getIsbn,

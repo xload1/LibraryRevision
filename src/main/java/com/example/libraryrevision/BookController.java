@@ -55,7 +55,7 @@ public class BookController {
     public ResponseEntity<Book> deleteBook(@PathVariable Long id){
         return switch (bookService.deleteBook(id)) {
             case DELETED  -> ResponseEntity.noContent().build();      // 204
-            case NOT_FOUND -> ResponseEntity.notFound().build();       // 404
+            case NOT_FOUND -> ResponseEntity.notFound().build();      // 404
             case CONFLICT -> ResponseEntity.status(409).build();
         };
     }
