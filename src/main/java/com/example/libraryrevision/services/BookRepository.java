@@ -2,6 +2,10 @@ package com.example.libraryrevision.services;
 
 import com.example.libraryrevision.library.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface BookRepository extends JpaRepository<Book, Long> {
+import java.util.List;
+
+public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
+    List<Book> findByAuthor(String author);
 }

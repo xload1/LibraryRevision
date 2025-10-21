@@ -3,10 +3,7 @@ package com.example.libraryrevision.library;
 import com.example.libraryrevision.DTOs.BookDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.cache.annotation.EnableCaching;
 
 import java.time.LocalDate;
@@ -14,8 +11,7 @@ import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "books")
 public class Book {
