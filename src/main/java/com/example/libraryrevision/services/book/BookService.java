@@ -1,17 +1,19 @@
-package com.example.libraryrevision.services;
+package com.example.libraryrevision.services.book;
 
 import com.example.libraryrevision.DTOs.BookDTO;
 import com.example.libraryrevision.DTOs.FilterDTO;
 import com.example.libraryrevision.library.Book;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
@@ -32,6 +34,32 @@ public class BookService {
         return bookRepository.save(book);
     }
 
+    @Transactional
+    @CacheEvict(cacheNames = "books", key = "#id")
+    public Optional<Book> updateBook(Long id, BookDTO newBook) {
+        return bookRepository.findById(id).map(b -> {
+            b.setTitle(newBook.getTitle());
+            b.setIsbn(newBook.getIsbn());
+            b.setStock(newBook.getStock());
+            b.setPublished_at(newBook.getPublished_at());
+            b.setAuthor(newBook.getAuthor());
+            return b;
+        });
+    }
+
+    public enum DeleteResult {DELETED, NOT_FOUND, CONFLICT;}
+    @Transactional
+    @CacheEvict(cacheNames = "books", key = "#id")
+    public DeleteResult deleteBook(Long id){
+        try {
+            bookRepository.deleteById(id);
+            return DeleteResult.DELETED;
+        } catch (EmptyResultDataAccessException e) {
+            return DeleteResult.NOT_FOUND;
+        } catch (DataIntegrityViolationException e) {
+            return DeleteResult.CONFLICT;
+        }
+    }
     @Cacheable(cacheNames = "allBooks")
     public List<Book> getAllBooks(){
         return bookRepository.findAll();

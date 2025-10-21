@@ -3,24 +3,21 @@ package com.example.libraryrevision;
 import com.example.libraryrevision.DTOs.BookDTO;
 import com.example.libraryrevision.DTOs.FilterDTO;
 import com.example.libraryrevision.library.Book;
-import com.example.libraryrevision.services.BookService;
-import com.example.libraryrevision.services.BookSpecs;
+import com.example.libraryrevision.services.book.BookService;
+import com.example.libraryrevision.services.book.BookSpecs;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.net.URI;
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/books")
@@ -37,10 +34,32 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<Book> postBook(@RequestBody @Valid BookDTO dto){
-        Book book = new Book(dto);
-        Book saved = bookService.addBook(book);
-        return ResponseEntity.ok(saved);
+        Book saved = bookService.addBook(new Book(dto));
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(saved.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(saved);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@RequestBody @Valid BookDTO dto, @PathVariable Long id) {
+        return bookService.updateBook(id, dto)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Book> deleteBook(@PathVariable Long id){
+        return switch (bookService.deleteBook(id)) {
+            case DELETED  -> ResponseEntity.noContent().build();      // 204
+            case NOT_FOUND -> ResponseEntity.notFound().build();       // 404
+            case CONFLICT -> ResponseEntity.status(409).build();
+        };
+    }
+
     //Get all books filtered with many parameters + sorted in chosen order
     @PostMapping(
             path = "/search",
@@ -66,5 +85,4 @@ public class BookController {
         Page<Book> pageResult = bookService.getFilteredBooks(spec, pageable);
         return ResponseEntity.ok(pageResult);
     }
-
 }

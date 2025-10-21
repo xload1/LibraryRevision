@@ -2,10 +2,9 @@ package com.example.libraryrevision;
 
 import com.example.libraryrevision.DTOs.FilterDTO;
 import com.example.libraryrevision.library.Book;
-import com.example.libraryrevision.services.BookRepository;
-import com.example.libraryrevision.services.BookService;
-import com.example.libraryrevision.services.BookSpecs;
-import org.assertj.core.api.ListAssert;
+import com.example.libraryrevision.services.book.BookRepository;
+import com.example.libraryrevision.services.book.BookService;
+import com.example.libraryrevision.services.book.BookSpecs;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +22,6 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
